@@ -17,7 +17,7 @@ jobs:
           cd Demo
           xcodebuild build \
             -project Demo.xcodeproj \
-            -scheme KeyboardKitDemo \
+            -scheme Demo \
             -sdk iphoneos \
             -configuration Release \
             CODE_SIGN_IDENTITY="" \

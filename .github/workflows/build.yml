@@ -12,13 +12,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build the Keyboard Extension
+      - name: Locate Workspace and Build
         run: |
-          cd Demo
-          # We use -workspace instead of -project. 
-          # This forces Xcode to respect all the internal framework links.
+          # Dynamically find the .xcworkspace file
+          WORKSPACE=$(find . -name "*.xcworkspace" | head -n 1)
+          
+          if [ -z "$WORKSPACE" ]; then
+            echo "Error: No .xcworkspace found."
+            exit 1
+          fi
+          
+          echo "Building workspace: $WORKSPACE"
+          
           xcodebuild build \
-            -workspace Demo.xcworkspace \
+            -workspace "$WORKSPACE" \
             -scheme Keyboard \
             -sdk iphoneos \
             -configuration Release \
@@ -29,12 +36,11 @@ jobs:
             -derivedDataPath build
           
           mkdir -p Payload
-          # Locate the compiled keyboard extension and package it
           find build -name "*.appex" -exec cp -r {} Payload/ \;
           zip -r CustomKeyboard.ipa Payload
 
-      - name: Upload IPA for Download
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: CustomKeyboardApp
-          path: Demo/CustomKeyboard.ipa
+          path: CustomKeyboard.ipa

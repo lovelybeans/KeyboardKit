@@ -17,6 +17,13 @@ import SwiftUI
 /// autocomplete, themes, etc.
 ///
 /// For app-specific features, check out the main app target.
+
+class CustomKeyboardStyle: StandardKeyboardStyleProvider {
+    override var keyboardBackgroundStyle: KeyboardStyle.Background {
+        return .image(Image("hunter"))
+    }
+}
+
 class KeyboardViewController: KeyboardInputViewController {
 
     /// ‼️ If this doesn't log when the debugger is attached,
@@ -24,7 +31,6 @@ class KeyboardViewController: KeyboardInputViewController {
     deinit {
         NSLog("__DEINIT__")
     }
-
 
     /// This function is called when the controller launches,
     /// and is where you can set up KeyboardKit for your app.
@@ -42,6 +48,11 @@ class KeyboardViewController: KeyboardInputViewController {
             case .success:
                 self?.setupDemoServices()
                 self?.setupDemoState()
+
+                if let self = self {
+                    self.services.styleProvider = CustomKeyboardStyle(keyboardContext: self.state.keyboardContext)
+                }
+
             case .failure(let error):
                 print(error)
             }

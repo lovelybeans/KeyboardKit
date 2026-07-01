@@ -9,18 +9,20 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: List Available Xcode Versions
-        run: ls /Applications | grep Xcode
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build the App (Unsigned)
+      - name: Resolve Dependencies
+        run: |
+          cd Demo
+          xcodebuild -resolvePackageDependencies -project Demo.xcodeproj -scheme Keyboard
+
+      - name: Build the Keyboard Extension
         run: |
           cd Demo
           xcodebuild build \
             -project Demo.xcodeproj \
-            -scheme Demo \
+            -scheme Keyboard \
             -sdk iphoneos \
             -configuration Release \
             CODE_SIGN_IDENTITY="" \
@@ -29,7 +31,8 @@ jobs:
             -derivedDataPath build
           
           mkdir -p Payload
-          cp -r build/Build/Products/Release-iphoneos/*.app Payload/
+          # Moves the compiled keyboard extension into the payload folder
+          cp -r build/Build/Products/Release-iphoneos/*.appex Payload/
           zip -r CustomKeyboard.ipa Payload
 
       - name: Upload IPA for Download

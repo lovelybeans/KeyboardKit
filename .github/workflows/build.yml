@@ -3,18 +3,21 @@ name: Build Custom Keyboard
 on:
   push:
     branches: [ "master", "main" ]
-  workflow_dispatch: # Adds a button so you can trigger this manually on GitHub
+  workflow_dispatch: 
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Build the App (Unsigned)
-        working-directory: Demo
         run: |
+          cd Demo
           xcodebuild build \
             -project Demo.xcodeproj \
             -scheme Demo \
@@ -24,14 +27,13 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             -derivedDataPath build
-
+          
           mkdir -p Payload
           cp -r build/Build/Products/Release-iphoneos/*.app Payload/
           zip -r CustomKeyboard.ipa Payload
 
       - name: Upload IPA for Download
-        working-directory: Demo
         uses: actions/upload-artifact@v4
         with:
           name: CustomKeyboardApp
-          path: CustomKeyboard.ipa
+          path: Demo/CustomKeyboard.ipa

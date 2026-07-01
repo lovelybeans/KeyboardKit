@@ -12,12 +12,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Resolve Dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies -workspace Demo/Demo.xcworkspace -scheme Keyboard
+
       - name: Build the Keyboard Extension
         run: |
-          # Use -skipPackagePluginValidation to stop it from choking on metadata processors
-          # Build only the target, no dependencies resolution if possible
           xcodebuild build \
-            -workspace *.xcworkspace \
+            -workspace Demo/Demo.xcworkspace \
             -scheme Keyboard \
             -sdk iphoneos \
             -configuration Release \
@@ -29,6 +31,7 @@ jobs:
             -derivedDataPath build
           
           mkdir -p Payload
+          # Locate the .appex file anywhere in the build directory
           find build -name "*.appex" -exec cp -r {} Payload/ \;
           zip -r CustomKeyboard.ipa Payload
 

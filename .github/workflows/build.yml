@@ -9,8 +9,8 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+      - name: List Available Xcode Versions
+        run: ls /Applications | grep Xcode
 
       - name: Checkout Code
         uses: actions/checkout@v4
